@@ -21,6 +21,7 @@ export class Main extends Phaser.Scene {
   private sign!: Sign;
   private tilemap!: Phaser.Tilemaps.Tilemap;
   private worldLayer!: Phaser.Tilemaps.TilemapLayer;
+  private zones: Zone[] = [];
 
   constructor() {
     super(key.scene.main);
@@ -61,6 +62,7 @@ export class Main extends Phaser.Scene {
     aboveLayer.setDepth(Depth.AbovePlayer);
 
     this.addPlayer();
+    this.createZones();
 
     // Set the bounds of the camera
     this.cameras.main.setBounds(
@@ -84,6 +86,10 @@ export class Main extends Phaser.Scene {
     this.input.keyboard!.on('keydown-ESC', () => {
       this.scene.pause(key.scene.main);
       this.scene.launch(key.scene.menu);
+    });
+
+    this.input.keyboard!.on('keydown-ENTER', () => {
+      this.activeItem(this.player.x, this.player.y);
     });
   }
 
@@ -139,7 +145,66 @@ export class Main extends Phaser.Scene {
     );
   }
 
+  private createZones() {
+    this.zones = [
+      new Zone(this.zone1, { x: 500, y: 500 }, { x: 1000, y: 1000 }),
+      new Zone(this.zone2, { x: 1000, y: 1000 }, { x: 1500, y: 1500 }),
+    ];
+  }
+
   update() {
     this.player.update();
+    console.log(`Player position: X=${this.player.x}, Y=${this.player.y}`);
+  }
+
+  activeItem(x: number, y: number) {
+    this.zones.forEach((zone) => {
+      zone.isInZone(x, y);
+    });
+  }
+
+  zone1() {
+    console.log('on est dans zone 1');
+  }
+
+  zone2() {
+    console.log('on est dans zone 2');
+  }
+}
+
+class Zone {
+  action: () => void;
+  bottomLeftCorner: { x: number; y: number };
+  topRightCorner: { x: number; y: number };
+
+  constructor(
+    action: () => void,
+    bottomLeftCorner: { x: number; y: number },
+    topRightCorner: { x: number; y: number },
+  ) {
+    if (
+      bottomLeftCorner.x > topRightCorner.x ||
+      topRightCorner.y < bottomLeftCorner.y
+    ) {
+      throw new Error(
+        `Invalid zone : bottomLeftCorner must be above and to the left of topRightCorner.`,
+      );
+    }
+
+    this.action = action;
+    this.bottomLeftCorner = bottomLeftCorner;
+    this.topRightCorner = topRightCorner;
+  }
+
+  // Méthode pour vérifier si un point est dans cette zone
+  isInZone(x: number, y: number): void {
+    const isWithinXBounds =
+      x >= this.bottomLeftCorner.x && x <= this.topRightCorner.x;
+    const isWithinYBounds =
+      y <= this.topRightCorner.y && y >= this.bottomLeftCorner.y;
+
+    if (isWithinXBounds && isWithinYBounds) {
+      this.action();
+    }
   }
 }
