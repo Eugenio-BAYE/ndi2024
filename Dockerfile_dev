@@ -1,0 +1,22 @@
+ARG NODE_VERSION=22.0.0
+ARG PORT=3000
+
+# Utiliser une image Node
+FROM node:${NODE_VERSION}-alpine
+
+# Définir le répertoire de travail
+WORKDIR /app
+
+# Copier les fichiers nécessaires
+COPY package*.json ./
+COPY public ./public
+COPY src ./src
+
+# Installer les dépendances
+RUN npm install
+
+# Exposer le port par défaut de React
+EXPOSE ${PORT}
+
+# Commande pour démarrer l'application
+CMD ["npm", "start"]

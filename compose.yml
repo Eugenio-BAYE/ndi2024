@@ -1,0 +1,23 @@
+services:
+  front:
+    build:
+      context: .
+      dockerfile: Dockerfile_dev
+    ports:
+      - 3000:3000
+    volumes:
+      - /app/node_modules
+    develop:
+      watch:
+        - path: ./package.json
+          action: rebuild
+        - path: ./src
+          target: /app/src
+          action: sync
+    environment:
+      - CHOKIDAR_USEPOLLING=true # Pour le hot-reloading sur Docker
+
+
+networks:
+  default:
+    driver: bridge
