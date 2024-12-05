@@ -9,6 +9,15 @@ enum Animation {
   Down = 'player_down',
 }
 
+export interface PlayerState {
+  food: number;
+  energy: number;
+  social: number;
+  cleanliness: number;
+  mood: number;
+  health: number;
+}
+
 type Cursors = Record<
   'w' | 'a' | 's' | 'd' | 'up' | 'left' | 'down' | 'right' | 'space',
   Phaser.Input.Keyboard.Key
@@ -23,6 +32,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   body!: Phaser.Physics.Arcade.Body;
   cursors: Cursors;
   selector: Phaser.Physics.Arcade.StaticBody;
+  playerState: PlayerState;
 
   constructor(
     scene: Phaser.Scene,
@@ -58,6 +68,16 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
     // Add selector
     this.selector = scene.physics.add.staticBody(x - 8, y + 32, 16, 16);
+
+    // Set player state
+    this.playerState = {
+      food: 60,
+      energy: 50,
+      social: 30,
+      cleanliness: 100,
+      mood: 90,
+      health: 80,
+    };
   }
 
   /**
@@ -247,5 +267,143 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
             break;
         }
     }
+  }
+
+  /*
+   * Player actions
+   */
+
+  // Player action: sleep
+  public sleep() {
+    this.updateStateEnergy(50);
+  }
+
+  // Player action: sleep outside
+  public sleepOutside() {
+    this.updateStateEnergy(50);
+    this.updateStateCleanliness(-20);
+  }
+
+  // Player action: do sports
+  public doSports() {
+    this.updateStateHealth(30);
+    this.updateStateCleanliness(-20);
+    this.updateStateEnergy(-20);
+    this.updateStateFood(-20);
+  }
+
+  // Player action: work
+  public work() {
+    this.updateStateSocial(10);
+    this.updateStateEnergy(-40);
+    this.updateStateMood(-20);
+  }
+
+  // Player action: drink beer
+  public drinkBeer() {
+    this.updateStateSocial(15);
+    this.updateStateMood(20);
+    this.updateStateHealth(-10);
+  }
+
+  // Player action: hangover
+  public hangover() {
+    this.updateStateMood(-40);
+    this.updateStateEnergy(-40);
+    this.updateStateHealth(-40);
+    this.updateStateSocial(-40);
+    this.updateStateFood(-40);
+    this.updateStateCleanliness(-40);
+  }
+
+  // Player action: play darts
+  public playDarts() {
+    this.updateStateSocial(10);
+    this.updateStateMood(5);
+  }
+
+  // Player action: smoke
+  public smoke() {
+    this.updateStateSocial(10);
+    this.updateStateMood(5);
+    this.updateStateHealth(-20);
+  }
+
+  // Player action: read
+  public read() {
+    this.updateStateHealth(5);
+    this.updateStateMood(10);
+  }
+
+  // Player action: play games
+  public playGames() {
+    this.updateStateMood(20);
+    this.updateStateCleanliness(-30);
+  }
+
+  // Player action: eat healthy
+  public eatHealthy() {
+    this.updateStateFood(20);
+  }
+
+  // Player action: eat unhealthy
+  public eatUnhealthy() {
+    this.updateStateFood(30);
+    this.updateStateHealth(-20);
+  }
+
+  // Player action: stay at home too much
+  public stayAtHomeTooMuch() {
+    this.updateStateSocial(-20);
+    this.updateStateMood(-15);
+    this.updateStateCleanliness(-30);
+  }
+
+  // Player action: clean the house
+  public cleanHouse() {
+    this.updateStateCleanliness(20);
+    this.updateStateEnergy(-15);
+  }
+
+  // Player action: take a shower
+  public takeShower() {
+    this.updateStateCleanliness(20);
+    this.updateStateEnergy(-15);
+  }
+
+  private updateStateFood(increment: number) {
+    this.playerState.food = Math.min(100, this.playerState.food + increment);
+  }
+
+  private updateStateSocial(increment: number) {
+    this.playerState.social = Math.min(
+      100,
+      this.playerState.social + increment,
+    );
+  }
+
+  private updateStateEnergy(increment: number) {
+    this.playerState.energy = Math.min(
+      100,
+      this.playerState.energy + increment,
+    );
+  }
+
+  private updateStateCleanliness(increment: number) {
+    this.playerState.cleanliness = Math.min(
+      100,
+      this.playerState.cleanliness + increment,
+    );
+  }
+
+  private updateStateMood(increment: number) {
+    this.playerState.mood = Math.min(100, this.playerState.mood + increment);
+  }
+
+  private updateStateHealth(increment: number) {
+    this.playerState.health = Math.min(
+      100,
+      this.playerState.health + increment,
+    );
   }
 }
