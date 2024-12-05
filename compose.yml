@@ -1,6 +1,5 @@
 services:
   front:
-    profiles: ["dev"]
     build:
       context: .
       dockerfile: Dockerfile_dev
@@ -18,13 +17,6 @@ services:
     environment:
       - CHOKIDAR_USEPOLLING=true # Pour le hot-reloading sur Docker
 
-  front-prod:
-    profiles: ["prod"]
-    build:
-      context: .
-      dockerfile: Dockerfile_prod
-    ports:
-      - 8080:80
 
 networks:
   default:
