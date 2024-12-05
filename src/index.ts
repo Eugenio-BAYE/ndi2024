@@ -4,6 +4,7 @@ import * as scenes from './scenes';
 
 /**
  * https://rexrainbow.github.io/phaser3-rex-notes/docs/site/game/
+ * UI
  */
 new Phaser.Game({
   width: 800, // 1024
