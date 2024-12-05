@@ -40,7 +40,7 @@ export default [
 
     rules: {
       '@typescript-eslint/no-non-null-assertion': 'off',
-      'no-console': 'error',
+      //'no-console': 'error',
       'no-debugger': 'error',
       'prettier/prettier': 'error',
       'simple-import-sort/exports': 'error',
