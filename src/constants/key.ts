@@ -17,6 +17,8 @@ const scene = {
   main: 'main',
   menu: 'menu',
   room: 'room',
+  dialog: 'dialog',
+  choiceDialog: 'choiceDialog',
 } as const;
 
 const tilemap = {

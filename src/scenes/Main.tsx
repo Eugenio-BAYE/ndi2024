@@ -11,6 +11,7 @@ import {
 } from '../constants';
 import { Player } from '../sprites';
 import { state } from '../state';
+import { ChoiceDialog } from './ChoiceDialog';
 
 interface Sign extends Phaser.Physics.Arcade.StaticBody {
   text?: string;
@@ -88,8 +89,17 @@ export class Main extends Phaser.Scene {
       this.scene.launch(key.scene.menu);
     });
 
-    this.input.keyboard!.on('keydown-ENTER', () => {
-      this.activeItem(this.player.x, this.player.y);
+    // TODO : Remove
+    this.input.keyboard!.on('keydown-SPACE', () => {
+      this.scene.pause(key.scene.main);
+      ChoiceDialog.speakerName = 'Hugo';
+      ChoiceDialog.question = 'Coucou jeune pute !';
+      ChoiceDialog.firstChoice = 'Ouisssssssss';
+      ChoiceDialog.secondChoice = 'Nonsssssss';
+      ChoiceDialog.firstChoiceCallback = () => alert('ntm');
+      ChoiceDialog.secondChoiceCallback = () => alert('ntm un peu moin');
+      this.scene.bringToTop(key.scene.choiceDialog);
+      this.scene.launch(key.scene.choiceDialog);
     });
   }
 
