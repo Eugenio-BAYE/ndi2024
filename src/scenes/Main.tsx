@@ -11,7 +11,6 @@ import {
 } from '../constants';
 import { Player } from '../sprites';
 import { state } from '../state';
-import { ChoiceDialog } from './ChoiceDialog';
 
 interface Sign extends Phaser.Physics.Arcade.StaticBody {
   text?: string;
@@ -89,17 +88,8 @@ export class Main extends Phaser.Scene {
       this.scene.launch(key.scene.menu);
     });
 
-    // TODO : Remove
-    this.input.keyboard!.on('keydown-SPACE', () => {
-      this.scene.pause(key.scene.main);
-      ChoiceDialog.speakerName = 'Hugo';
-      ChoiceDialog.question = 'Coucou jeune pute !';
-      ChoiceDialog.firstChoice = 'Ouisssssssss';
-      ChoiceDialog.secondChoice = 'Nonsssssss';
-      ChoiceDialog.firstChoiceCallback = () => alert('ntm');
-      ChoiceDialog.secondChoiceCallback = () => alert('ntm un peu moin');
-      this.scene.bringToTop(key.scene.choiceDialog);
-      this.scene.launch(key.scene.choiceDialog);
+    this.input.keyboard!.on('keydown-ENTER', () => {
+      this.activeItem(this.player.x, this.player.y);
     });
   }
 
@@ -157,13 +147,99 @@ export class Main extends Phaser.Scene {
 
   private createZones() {
     this.zones = [
-      new Zone(this.zone1, { x: 500, y: 500 }, { x: 1000, y: 1000 }),
-      new Zone(this.zone2, { x: 1000, y: 1000 }, { x: 1500, y: 1500 }),
+      // On bar
+      new Zone(
+        this.drinkBeer,
+        { x: 500, y: 500 },
+        { x: 1000, y: 1000 },
+        'Drink a cold beer',
+      ),
+      new Zone(
+        this.smoke,
+        { x: 500, y: 500 },
+        { x: 1000, y: 1000 },
+        'Smoke a cigarette',
+      ),
+      new Zone(
+        this.playDart,
+        { x: 500, y: 500 },
+        { x: 1000, y: 1000 },
+        'Play darts with friends',
+      ),
+      new Zone(
+        this.hangover,
+        { x: 500, y: 500 },
+        { x: 1000, y: 1000 },
+        'Recover from a hangover',
+      ),
+      new Zone(
+        this.stayTooMuchBar,
+        { x: 500, y: 500 },
+        { x: 1000, y: 1000 },
+        'Stay too long at bar',
+      ),
+
+      // Outside
+      new Zone(
+        this.goHome,
+        { x: 500, y: 500 },
+        { x: 1000, y: 1000 },
+        'Go back home',
+      ),
+      new Zone(
+        this.goBar,
+        { x: 500, y: 500 },
+        { x: 1000, y: 1000 },
+        'Go to the bar',
+      ),
+      new Zone(
+        this.doBike,
+        { x: 500, y: 500 },
+        { x: 1000, y: 1000 },
+        'Ride your bike',
+      ),
+      new Zone(
+        this.work,
+        { x: 500, y: 500 },
+        { x: 1000, y: 1000 },
+        'Work hard at job',
+      ),
+      new Zone(
+        this.readBook,
+        { x: 500, y: 500 },
+        { x: 1000, y: 1000 },
+        'Read a good book',
+      ),
+      new Zone(
+        this.doVolley,
+        { x: 500, y: 500 },
+        { x: 1000, y: 1000 },
+        'Play volleyball on court',
+      ),
+      new Zone(
+        this.sleepBeach,
+        { x: 500, y: 500 },
+        { x: 1000, y: 1000 },
+        'Nap on the beach',
+      ),
+      new Zone(
+        this.peeOnFountain,
+        { x: 500, y: 500 },
+        { x: 1000, y: 1000 },
+        'Pee near the fountain',
+      ),
+      new Zone(
+        this.swim,
+        { x: 500, y: 500 },
+        { x: 1000, y: 1000 },
+        'Swim in the water',
+      ),
     ];
   }
 
   update() {
     this.player.update();
+    this.logItem(this.player.x, this.player.y, this.player);
     console.log(`Player position: X=${this.player.x}, Y=${this.player.y}`);
   }
 
@@ -173,12 +249,98 @@ export class Main extends Phaser.Scene {
     });
   }
 
-  zone1() {
-    console.log('on est dans zone 1');
+  logItem(x: number, y: number, player: Player) {
+    let isInAnyZone = false;
+
+    this.zones.forEach((zone) => {
+      if (zone.logMessageIfInZone(x, y, player)) {
+        isInAnyZone = true;
+      }
+    });
+
+    if (!isInAnyZone) {
+      player.setLabelVisible(false);
+    }
   }
 
-  zone2() {
-    console.log('on est dans zone 2');
+  sleepBed() {
+    console.log('You are sleeping in the bed.');
+  }
+
+  eat() {
+    console.log('You are eating a delicious meal.');
+  }
+
+  watchComputer() {
+    console.log('You are watching the computer. Be mindful of screen time!');
+  }
+
+  watchReels() {
+    console.log('You are watching reels on social media.');
+  }
+
+  goOut() {
+    console.log('You are going outside. Fresh air is good for you!');
+  }
+
+  stayTooMuchHome() {
+    console.log("You've stayed at home too long. Maybe go out?");
+  }
+
+  drinkBeer() {
+    console.log('You are drinking a cold beer. Cheers!');
+  }
+
+  smoke() {
+    console.log('You are smoking. Health warning: smoking is bad for you.');
+  }
+
+  playDart() {
+    console.log('You are playing darts. Good luck!');
+  }
+
+  hangover() {
+    console.log('You have a hangover. Drink some water and rest.');
+  }
+
+  stayTooMuchBar() {
+    console.log("You've stayed too long at the bar. Time to head home?");
+  }
+
+  goHome() {
+    console.log('You are heading back home.');
+  }
+
+  goBar() {
+    console.log('You are going to the bar.');
+  }
+
+  doBike() {
+    console.log('You are biking. Keep up the cardio!');
+  }
+
+  work() {
+    console.log("You are working hard. Don't forget to take breaks!");
+  }
+
+  readBook() {
+    console.log('You are reading a book. Enjoy the story.');
+  }
+
+  doVolley() {
+    console.log('You are playing volleyball. Great teamwork!');
+  }
+
+  sleepBeach() {
+    console.log('You are sleeping on the beach. Relax and enjoy the waves.');
+  }
+
+  peeOnFountain() {
+    console.log('You are peeing on a fountain. Not cool...');
+  }
+
+  swim() {
+    console.log('You are swimming in the water. Stay safe!');
   }
 }
 
@@ -186,11 +348,13 @@ class Zone {
   action: () => void;
   bottomLeftCorner: { x: number; y: number };
   topRightCorner: { x: number; y: number };
+  message: string;
 
   constructor(
     action: () => void,
     bottomLeftCorner: { x: number; y: number },
     topRightCorner: { x: number; y: number },
+    message: string,
   ) {
     if (
       bottomLeftCorner.x > topRightCorner.x ||
@@ -204,9 +368,9 @@ class Zone {
     this.action = action;
     this.bottomLeftCorner = bottomLeftCorner;
     this.topRightCorner = topRightCorner;
+    this.message = message;
   }
 
-  // Méthode pour vérifier si un point est dans cette zone
   isInZone(x: number, y: number): void {
     const isWithinXBounds =
       x >= this.bottomLeftCorner.x && x <= this.topRightCorner.x;
@@ -216,5 +380,22 @@ class Zone {
     if (isWithinXBounds && isWithinYBounds) {
       this.action();
     }
+  }
+
+  logMessageIfInZone(x: number, y: number, player: Player): boolean {
+    const isWithinXBounds =
+      x >= this.bottomLeftCorner.x && x <= this.topRightCorner.x;
+    const isWithinYBounds =
+      y <= this.topRightCorner.y && y >= this.bottomLeftCorner.y;
+
+    if (isWithinXBounds && isWithinYBounds) {
+      if (player.getLabelText() !== this.message) {
+        player.setLabelText(this.message);
+        player.setLabelVisible(true);
+      }
+      return true; // Retourne true si le joueur est dans la zone
+    }
+
+    return false; // Retourne false si le joueur n'est pas dans cette zone
   }
 }

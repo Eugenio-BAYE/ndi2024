@@ -11,10 +11,13 @@ import {
   TILESET_ROOM5,
 } from '../constants';
 import { Player } from '../sprites';
+import { ChoiceDialog } from './ChoiceDialog';
+import { Zone } from './Zone';
 
 export class Room extends Phaser.Scene {
   private player!: Player;
   private tilemap!: Phaser.Tilemaps.Tilemap;
+  private zones: Zone[] = [];
 
   // Room layers
   private roomLayer1!: Phaser.Tilemaps.TilemapLayer;
@@ -31,6 +34,7 @@ export class Room extends Phaser.Scene {
 
   create() {
     this.tilemap = this.make.tilemap({ key: key.tilemap.room });
+    this.createZones();
 
     // Add the tilesets to the tilemap
     const tileset1 = this.tilemap.addTilesetImage(
@@ -147,6 +151,15 @@ export class Room extends Phaser.Scene {
       this.tilemap.heightInPixels,
     );
     this.cameras.main.startFollow(this.player);
+
+    this.input.keyboard!.on('keydown-ESC', () => {
+      this.scene.pause(key.scene.room);
+      this.scene.launch(key.scene.menu);
+    });
+
+    this.input.keyboard!.on('keydown-ENTER', () => {
+      this.activeItem(this.player.x, this.player.y);
+    });
   }
 
   private addPlayer() {
@@ -166,7 +179,144 @@ export class Room extends Phaser.Scene {
     this.physics.add.collider(this.player, this.roomLayer7);
   }
 
+  private createZones() {
+    this.zones = [
+      // Home
+      new Zone(
+        () => {
+          this.sleepBed();
+        },
+        { x: 500, y: 500 },
+        { x: 1000, y: 1000 },
+        'Sleep in your bed',
+      ),
+      new Zone(
+        () => {
+          this.eat();
+        },
+        { x: 63, y: 100 },
+        { x: 144, y: 191 },
+        'Eat a delicious meal',
+      ),
+      new Zone(
+        () => this.watchComputer(),
+        { x: 59, y: 229 },
+        { x: 97, y: 258 },
+        'Watch your computer screen',
+      ),
+      new Zone(
+        this.watchReels,
+        { x: 500, y: 500 },
+        { x: 1000, y: 1000 },
+        'Watch social media reels',
+      ),
+      new Zone(
+        this.goOut,
+        { x: 158, y: 241 },
+        { x: 193, y: 259 },
+        'Go out for fresh air',
+      ),
+      new Zone(
+        this.stayTooMuchHome,
+        { x: 500, y: 500 },
+        { x: 1000, y: 1000 },
+        'Stay home too long',
+      ),
+    ];
+  }
+
   update() {
     this.player.update();
+    this.logItem(this.player.x, this.player.y, this.player);
+  }
+
+  activeItem(x: number, y: number) {
+    this.zones.forEach((zone) => {
+      zone.isInZone(x, y);
+    });
+  }
+
+  logItem(x: number, y: number, player: Player) {
+    let isInAnyZone = false;
+
+    this.zones.forEach((zone) => {
+      if (zone.logMessageIfInZone(x, y, player)) {
+        isInAnyZone = true;
+      }
+    });
+
+    if (!isInAnyZone) {
+      player.setLabelVisible(false);
+    }
+  }
+
+  sleepBed() {
+    console.log('You are sleeping in the bed.');
+  }
+
+  eat() {
+    this.scene.pause(key.scene.room);
+    ChoiceDialog.speakerName = 'TOIIIIIII';
+    ChoiceDialog.question = 'What do you want to eat';
+    ChoiceDialog.firstChoice = 'Healthy Food';
+    ChoiceDialog.secondChoice = 'Junk Food';
+    ChoiceDialog.firstChoiceCallback = () => this.eatHealthy();
+    ChoiceDialog.secondChoiceCallback = () => this.eatJunkFood();
+    this.scene.bringToTop(key.scene.choiceDialog);
+    this.scene.launch(key.scene.choiceDialog);
+    this.scene.resume();
+  }
+
+  eatHealthy() {
+    this.player.eatHealthy();
+  }
+
+  eatJunkFood() {
+    this.player.eatUnhealthy();
+  }
+
+  watchComputer() {
+    this.scene.pause(key.scene.room);
+    ChoiceDialog.speakerName = 'Gogole';
+    ChoiceDialog.question = 'Are you sure you want to play ?';
+    ChoiceDialog.firstChoice = 'Yes';
+    ChoiceDialog.secondChoice = 'No';
+    ChoiceDialog.firstChoiceCallback = () => this.watchReels();
+    this.scene.bringToTop(key.scene.choiceDialog);
+    this.scene.launch(key.scene.choiceDialog);
+    this.scene.resume();
+  }
+
+  watchReels() {
+    console.log('You are watching reels on social media.');
+  }
+
+  goOut() {
+    console.log('You are going outside. Fresh air is good for you!');
+    this.scene.pause(key.scene.room);
+    ChoiceDialog.speakerName = 'Gogole';
+    ChoiceDialog.question = 'Are you sure you want to leave?';
+    ChoiceDialog.firstChoice = 'Yes';
+    ChoiceDialog.secondChoice = 'No';
+    ChoiceDialog.firstChoiceCallback = () => this.exit();
+    this.scene.bringToTop(key.scene.choiceDialog);
+    this.scene.launch(key.scene.choiceDialog);
+    this.scene.resume();
+  }
+
+  stayTooMuchHome() {
+    console.log("You've stayed at home too long. Maybe go out?");
+  }
+
+  exit() {
+    this.scene.pause(key.scene.room);
+    ChoiceDialog.speakerName = 'Gogole';
+    ChoiceDialog.question = 'You stay too much time here, do something';
+    ChoiceDialog.firstChoice = 'Oh';
+    ChoiceDialog.secondChoice = 'Oh';
+    this.player.stayAtHomeTooMuch();
+    this.scene.bringToTop(key.scene.choiceDialog);
+    this.scene.launch(key.scene.choiceDialog);
+    this.scene.resume();
   }
 }

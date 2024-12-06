@@ -33,6 +33,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   cursors: Cursors;
   selector: Phaser.Physics.Arcade.StaticBody;
   playerState: PlayerState;
+  label!: Phaser.GameObjects.Text; // Propriété pour le texte
+  labelBackground!: Phaser.GameObjects.Rectangle; // Propriété pour le fond du texte
+  private labelVelocity = { x: 0, y: 0 };
 
   constructor(
     scene: Phaser.Scene,
@@ -65,6 +68,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
     // Create sprite animations
     this.createAnimations();
+
+    this.createLabel(scene);
 
     // Add selector
     this.selector = scene.physics.add.staticBody(x - 8, y + 32, 16, 16);
@@ -182,6 +187,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   update() {
     const { anims, body, cursors } = this;
     const prevVelocity = body.velocity.clone();
+
+    this.updateLabelPosition();
 
     // Stop any previous movement from the last frame
     body.setVelocity(0);
@@ -405,5 +412,92 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       100,
       this.playerState.health + increment,
     );
+  }
+
+  private createLabel(scene: Phaser.Scene) {
+    const offsetY = -20; // Décalage vertical au-dessus de la tête
+
+    // Crée un rectangle de fond pour le texte
+    this.labelBackground = scene.add.rectangle(
+      this.x,
+      this.y + offsetY,
+      50, // Largeur initiale
+      20, // Hauteur initiale
+      0x000000, // Couleur noire
+      0.5, // Transparence
+    );
+    this.labelBackground.setOrigin(0.5, 0.5); // Origine centrée
+
+    // Crée le texte
+    this.label = scene.add.text(this.x, this.y + offsetY, 'Hello!', {
+      fontSize: '12px',
+      color: '#ffffff',
+      align: 'center',
+      fontStyle: 'bold',
+    });
+    this.label.setOrigin(0.5, 0.5); // Origine centrée
+
+    // Masque l'étiquette par défaut
+    this.setLabelVisible(false);
+  }
+
+  /**
+   * Met à jour la position du texte et du fond au-dessus du sprite.
+   */
+  private updateLabelPosition() {
+    const offsetY = -20; // Décalage vertical
+    const targetX = this.x;
+    const targetY = this.y + offsetY;
+
+    const smoothSpeed = 0.2; // Valeur réduite pour un mouvement plus réactif sans orbite
+
+    // Mise à jour directe mais lisse de la position du texte
+    this.label.x += (targetX - this.label.x) * smoothSpeed;
+    this.label.y += (targetY - this.label.y) * smoothSpeed;
+
+    this.labelBackground.x = this.label.x;
+    this.labelBackground.y = this.label.y;
+  }
+
+  /**
+   * Change le texte au-dessus de la tête.
+   */
+  public setLabelText(newText: string, bold: boolean = false) {
+    // Met à jour le texte
+    this.label.setText(newText);
+
+    // Ajuste le style si nécessaire
+    this.label.setStyle({ fontStyle: bold ? 'bold' : 'normal' });
+
+    // Calcule la largeur du rectangle avec un padding
+    const padding = 10; // Espace supplémentaire autour du texte
+    this.labelBackground.width = this.label.width + padding;
+
+    // Centre l'origine du texte et du rectangle
+    this.label.setOrigin(0.5, 0.5); // Centre le texte
+    this.labelBackground.setOrigin(0.5, 0.5); // Centre le rectangle
+  }
+
+  public getLabelText() {
+    return this.label.text;
+  }
+  /**
+   * Rend l'étiquette visible ou invisible.
+   */
+  public setLabelVisible(visible: boolean) {
+    this.label.setVisible(visible);
+    this.labelBackground.setVisible(visible);
+  }
+
+  public getLabelVisible(): boolean {
+    return this.label.visible;
+  }
+
+  /**
+   * Détruit complètement l'étiquette (texte et fond).
+   */
+  public destroyLabel() {
+    this.label.destroy();
+    this.labelBackground.destroy();
   }
 }
