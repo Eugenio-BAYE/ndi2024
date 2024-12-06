@@ -35,6 +35,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   playerState: PlayerState;
   label!: Phaser.GameObjects.Text; // Propriété pour le texte
   labelBackground!: Phaser.GameObjects.Rectangle; // Propriété pour le fond du texte
+  private labelVelocity = { x: 0, y: 0 };
 
   constructor(
     scene: Phaser.Scene,
@@ -439,13 +440,23 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     // Masque l'étiquette par défaut
     this.setLabelVisible(false);
   }
+
   /**
    * Met à jour la position du texte et du fond au-dessus du sprite.
    */
   private updateLabelPosition() {
     const offsetY = -20; // Décalage vertical
-    this.label.setPosition(this.x, this.y + offsetY);
-    this.labelBackground.setPosition(this.x, this.y + offsetY);
+    const targetX = this.x;
+    const targetY = this.y + offsetY;
+
+    const smoothSpeed = 0.2; // Valeur réduite pour un mouvement plus réactif sans orbite
+
+    // Mise à jour directe mais lisse de la position du texte
+    this.label.x += (targetX - this.label.x) * smoothSpeed;
+    this.label.y += (targetY - this.label.y) * smoothSpeed;
+
+    this.labelBackground.x = this.label.x;
+    this.labelBackground.y = this.label.y;
   }
 
   /**
@@ -465,13 +476,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     // Centre l'origine du texte et du rectangle
     this.label.setOrigin(0.5, 0.5); // Centre le texte
     this.labelBackground.setOrigin(0.5, 0.5); // Centre le rectangle
-
-    // Décalage vertical au-dessus de la tête du joueur
-    const offsetY = -20;
-
-    // Place le rectangle et le texte
-    this.labelBackground.setPosition(this.x, this.y + offsetY); // Rectangle centré
-    this.label.setPosition(this.labelBackground.x, this.labelBackground.y); // Texte centré dans le rectangle
   }
 
   public getLabelText() {
