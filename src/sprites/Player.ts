@@ -80,6 +80,33 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     };
   }
 
+  public getStats() {
+    return this.playerState;
+  }
+
+  public getHunger() {
+    return this.playerState.food;
+  }
+
+  public getEnergy() {
+    return this.playerState.energy;
+  }
+
+  public getSocial() {
+    return this.playerState.social;
+  }
+
+  public getCleanliness() {
+    return this.playerState.cleanliness;
+  }
+
+  public getMood() {
+    return this.playerState.mood;
+  }
+
+  public getHealth() {
+    return this.playerState.health;
+  }
   /**
    * Track the arrow keys & WASD.
    */
@@ -373,6 +400,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
   private updateStateFood(increment: number) {
     this.playerState.food = Math.min(100, this.playerState.food + increment);
+    this.playerState.food = Math.max(0, this.playerState.food);
   }
 
   private updateStateSocial(increment: number) {
@@ -380,6 +408,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       100,
       this.playerState.social + increment,
     );
+    this.playerState.social = Math.max(0, this.playerState.social);
   }
 
   private updateStateEnergy(increment: number) {
@@ -387,6 +416,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       100,
       this.playerState.energy + increment,
     );
+    this.playerState.energy = Math.max(0, this.playerState.energy);
   }
 
   private updateStateCleanliness(increment: number) {
@@ -394,10 +424,12 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       100,
       this.playerState.cleanliness + increment,
     );
+    this.playerState.cleanliness = Math.max(0, this.playerState.cleanliness);
   }
 
   private updateStateMood(increment: number) {
     this.playerState.mood = Math.min(100, this.playerState.mood + increment);
+    this.playerState.mood = Math.max(0, this.playerState.mood);
   }
 
   private updateStateHealth(increment: number) {
@@ -405,5 +437,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       100,
       this.playerState.health + increment,
     );
+    this.playerState.health = Math.max(0, this.playerState.health);
   }
 }

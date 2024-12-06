@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { render } from 'phaser-jsx';
 
 import { TilemapDebug, Typewriter } from '../components';
+import { StatsBars } from '../components/StatsBars';
 import {
   Depth,
   key,
@@ -91,6 +92,10 @@ export class Main extends Phaser.Scene {
 
     // TODO : Remove
     this.input.keyboard!.on('keydown-SPACE', () => {
+      console.log(this.player.getStats());
+      this.player.doSports();
+      render(<StatsBars {...this.player.getStats()} />, this);
+      console.log(this.player.getStats());
       this.scene.pause(key.scene.main);
       ChoiceDialog.speakerName = 'Hugo';
       ChoiceDialog.question = 'Coucou jeune pute !';
@@ -113,6 +118,8 @@ export class Main extends Phaser.Scene {
 
     this.player = new Player(this, spawnPoint.x!, spawnPoint.y!);
     this.addPlayerSignInteraction();
+    const playerStats = this.player.getStats();
+    render(<StatsBars {...playerStats} />, this);
 
     // Watch the player and worldLayer for collisions
     this.physics.add.collider(this.player, this.worldLayer);
