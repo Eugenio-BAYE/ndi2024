@@ -15,11 +15,11 @@ export class Boot extends Scene {
     });
 
     this.load.image(key.image.tuxemon, assets.tilesets.tuxemon);
-    this.load.image('roomTileset1', assets.tilesets.roomTileset1);
-    this.load.image('roomTileset2', assets.tilesets.roomTileset2);
-    this.load.image('roomTileset3', assets.tilesets.roomTileset3);
-    this.load.image('roomTileset4', assets.tilesets.roomTileset4);
-    this.load.image('roomTileset5', assets.tilesets.roomTileset5);
+    this.load.image('room1', assets.tilesets.room1);
+    this.load.image('room2', assets.tilesets.room2);
+    this.load.image('room3', assets.tilesets.room3);
+    this.load.image('room4', assets.tilesets.room4);
+    this.load.image('room5', assets.tilesets.room5);
 
     this.load.tilemapTiledJSON(key.tilemap.tuxemon, assets.tilemaps.tuxemon);
     this.load.tilemapTiledJSON(key.tilemap.room, assets.tilemaps.room);
